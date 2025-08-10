@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid()) @db.Uuid
+  email     String   
+  nickName  String   @unique
+  name      String   
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tasks     Task[]
+  memo      Memo[]
+  goals     Goal[]
+}
+
+model Goal {
+  id String   @id @default(uuid()) @db.Uuid
+  content String @db.VarChar(255) 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  authorId  String   @db.Uuid
+
+  author        User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  tasks    Task[]
+}
+
+model Task {
+  id String   @id @default(uuid()) @db.Uuid
+  title      String  @db.VarChar(255) 
+  content    String  @db.VarChar(255) 
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  completed  Boolean  @default(false)
+  priority   Priority @default(MEDIUM)
+  repeatDays  DayOfWeek[] @default([]) 
+  startDate  DateTime 
+  endDate    DateTime 
+  
+  authorId     String @db.Uuid
+  goalId     String @db.Uuid
+
+  author     User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  goal       Goal @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  
+  memo      Memo[]
+
+  @@index([createdAt(sort: Desc)])
+}
+
+model Memo {
+  taskId    String    @db.Uuid
+  memoId    String    @db.Uuid
+
+  content    String    @db.Text
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  authorId   String    @db.Uuid
+  postId    String     @db.Uuid
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, memoId])
+}
+
+enum Priority {
+  HIGH   @map("중요")
+  MEDIUM @map("보통")
+  LOW    @map("낮음")
+}
+
+enum DayOfWeek {
+  MON
+  TUE
+  WED
+  THU
+  FRI
+  SAT
+  SUN
+}
