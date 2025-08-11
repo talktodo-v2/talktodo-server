@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { AuthController } from '../controller/app.controller';
+import { AuthController } from '../controller/auth.controller';
 import { KakaoStrategy } from '../kakao.strategy';
 import { AuthService } from '../service/auth.service';
 import { JwtModule } from '@nestjs/jwt';
