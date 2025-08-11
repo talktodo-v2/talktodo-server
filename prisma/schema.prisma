@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -10,11 +9,15 @@ datasource db {
 
 model User {
   id        String   @id @default(uuid()) @db.Uuid
-  email     String   
-  nickName  String   @unique
-  name      String   
+  nickName  String   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  profile String? @db.Text 
+
+  kakaoEmail String? @db.VarChar(255) @unique
+  naverEmail String? @db.VarChar(255) @unique
+  googleEmail String? @db.VarChar(255) @unique
+  currentLogin  Login? 
 
   tasks     Task[]
   memo      Memo[]
@@ -85,4 +88,10 @@ enum DayOfWeek {
   FRI
   SAT
   SUN
+}
+
+enum Login {
+  KAKAO
+  GOOGLE
+  NAVER
 }
