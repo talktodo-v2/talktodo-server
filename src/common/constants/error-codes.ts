@@ -1,0 +1,113 @@
+/**
+ * 에러 코드 상수 정의
+ * 형식: E{HTTP상태코드}{순번}
+ */
+export const ERROR_CODES = {
+  // 400 Bad Request
+  BAD_REQUEST: 'E400001',
+  VALIDATION_FAILED: 'E400002',
+  INVALID_INPUT: 'E400003',
+  MISSING_REQUIRED_FIELD: 'E400004',
+  INVALID_FORMAT: 'E400005',
+
+  // 401 Unauthorized
+  UNAUTHORIZED: 'E401001',
+  INVALID_TOKEN: 'E401002',
+  TOKEN_EXPIRED: 'E401003',
+  LOGIN_REQUIRED: 'E401004',
+  INVALID_CREDENTIALS: 'E401005',
+
+  // 403 Forbidden
+  FORBIDDEN: 'E403001',
+  ACCESS_DENIED: 'E403002',
+  INSUFFICIENT_PERMISSIONS: 'E403003',
+
+  // 404 Not Found
+  NOT_FOUND: 'E404001',
+  USER_NOT_FOUND: 'E404002',
+  RESOURCE_NOT_FOUND: 'E404003',
+  ENDPOINT_NOT_FOUND: 'E404004',
+
+  // 409 Conflict
+  CONFLICT: 'E409001',
+  DUPLICATE_DATA: 'E409002',
+  RESOURCE_ALREADY_EXISTS: 'E409003',
+
+  // 422 Unprocessable Entity
+  UNPROCESSABLE_ENTITY: 'E422001',
+  BUSINESS_RULE_VIOLATION: 'E422002',
+
+  // 429 Too Many Requests
+  RATE_LIMIT_EXCEEDED: 'E429001',
+  TOO_MANY_REQUESTS: 'E429002',
+
+  // 500 Internal Server Error
+  INTERNAL_SERVER_ERROR: 'E500001',
+  DATABASE_ERROR: 'E500002',
+  EXTERNAL_SERVICE_ERROR: 'E500003',
+  CONFIGURATION_ERROR: 'E500004',
+
+  // 502 Bad Gateway
+  BAD_GATEWAY: 'E502001',
+  UPSTREAM_ERROR: 'E502002',
+
+  // 503 Service Unavailable
+  SERVICE_UNAVAILABLE: 'E503001',
+  MAINTENANCE_MODE: 'E503002',
+  DATABASE_UNAVAILABLE: 'E503003',
+
+  // 504 Gateway Timeout
+  GATEWAY_TIMEOUT: 'E504001',
+  REQUEST_TIMEOUT: 'E504002',
+} as const;
+
+/**
+ * 에러 메시지 상수
+ */
+export const ERROR_MESSAGES = {
+  [ERROR_CODES.BAD_REQUEST]: '잘못된 요청입니다',
+  [ERROR_CODES.VALIDATION_FAILED]: '입력값 검증에 실패했습니다',
+  [ERROR_CODES.INVALID_INPUT]: '유효하지 않은 입력값입니다',
+  [ERROR_CODES.MISSING_REQUIRED_FIELD]: '필수 입력값이 누락되었습니다',
+  [ERROR_CODES.INVALID_FORMAT]: '올바르지 않은 형식입니다',
+
+  [ERROR_CODES.UNAUTHORIZED]: '인증이 필요합니다',
+  [ERROR_CODES.INVALID_TOKEN]: '유효하지 않은 토큰입니다',
+  [ERROR_CODES.TOKEN_EXPIRED]: '토큰이 만료되었습니다',
+  [ERROR_CODES.LOGIN_REQUIRED]: '로그인이 필요합니다',
+  [ERROR_CODES.INVALID_CREDENTIALS]: '잘못된 인증 정보입니다',
+
+  [ERROR_CODES.FORBIDDEN]: '접근 권한이 없습니다',
+  [ERROR_CODES.ACCESS_DENIED]: '접근이 거부되었습니다',
+  [ERROR_CODES.INSUFFICIENT_PERMISSIONS]: '권한이 부족합니다',
+
+  [ERROR_CODES.NOT_FOUND]: '요청한 리소스를 찾을 수 없습니다',
+  [ERROR_CODES.USER_NOT_FOUND]: '사용자를 찾을 수 없습니다',
+  [ERROR_CODES.RESOURCE_NOT_FOUND]: '리소스를 찾을 수 없습니다',
+  [ERROR_CODES.ENDPOINT_NOT_FOUND]: '요청한 엔드포인트를 찾을 수 없습니다',
+
+  [ERROR_CODES.CONFLICT]: '리소스 충돌이 발생했습니다',
+  [ERROR_CODES.DUPLICATE_DATA]: '중복된 데이터입니다',
+  [ERROR_CODES.RESOURCE_ALREADY_EXISTS]: '이미 존재하는 리소스입니다',
+
+  [ERROR_CODES.UNPROCESSABLE_ENTITY]: '처리할 수 없는 요청입니다',
+  [ERROR_CODES.BUSINESS_RULE_VIOLATION]: '비즈니스 규칙 위반입니다',
+
+  [ERROR_CODES.RATE_LIMIT_EXCEEDED]: '요청 한도를 초과했습니다',
+  [ERROR_CODES.TOO_MANY_REQUESTS]: '너무 많은 요청입니다',
+
+  [ERROR_CODES.INTERNAL_SERVER_ERROR]: '내부 서버 오류가 발생했습니다',
+  [ERROR_CODES.DATABASE_ERROR]: '데이터베이스 오류가 발생했습니다',
+  [ERROR_CODES.EXTERNAL_SERVICE_ERROR]: '외부 서비스 연동 중 오류가 발생했습니다',
+  [ERROR_CODES.CONFIGURATION_ERROR]: '서버 설정 오류입니다',
+
+  [ERROR_CODES.BAD_GATEWAY]: '게이트웨이 오류입니다',
+  [ERROR_CODES.UPSTREAM_ERROR]: '업스트림 서버 오류입니다',
+
+  [ERROR_CODES.SERVICE_UNAVAILABLE]: '서비스를 일시적으로 사용할 수 없습니다',
+  [ERROR_CODES.MAINTENANCE_MODE]: '서비스 점검 중입니다',
+  [ERROR_CODES.DATABASE_UNAVAILABLE]: '데이터베이스에 연결할 수 없습니다',
+
+  [ERROR_CODES.GATEWAY_TIMEOUT]: '게이트웨이 시간 초과입니다',
+  [ERROR_CODES.REQUEST_TIMEOUT]: '요청 시간이 초과되었습니다',
+} as const;

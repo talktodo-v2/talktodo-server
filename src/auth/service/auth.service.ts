@@ -34,7 +34,6 @@ export class AuthService {
 
   async register(email: string) {}
 
-  // JWT 토큰 생성
   async generateToken({ id }: GenerateTokenParams): Promise<string> {
     return this.jwtService.sign({ id });
   }

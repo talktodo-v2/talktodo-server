@@ -1,26 +1,28 @@
-// auth.controller.ts
-import { Controller, Get, Req, Res, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards, UseInterceptors, HttpCode, HttpStatus } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { AuthService } from '../service/auth.service';
 import { ResponseInterceptor, ResponseCode, ResponseMessage } from '../../common/interceptor/response.interceptor';
-import { getResponseMessage } from '../../common/code/index';
 import { LoginProvider } from '../types';
 import { KakaoAuthGuard } from '../guards/kakao-auth.guard';
 import { pickRedirectFromState } from '../util/pickRedirectFromState';
+import { SUCCESS_CODES, SUCCESS_MESSAGES } from '../../common/constants/success-codes';
+
 @UseInterceptors(ResponseInterceptor)
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Get('kakao')
-  @ResponseCode('S200010')
-  @ResponseMessage(getResponseMessage('S200010'))
+  @HttpCode(HttpStatus.OK)
+  @ResponseCode(SUCCESS_CODES.AUTH_KAKAO_START)
+  @ResponseMessage(SUCCESS_MESSAGES[SUCCESS_CODES.AUTH_KAKAO_START])
   @UseGuards(KakaoAuthGuard)
   start() {}
 
   @Get('kakao/callback')
-  @ResponseCode('S200021')
-  @ResponseMessage(getResponseMessage('S200021'))
+  @HttpCode(HttpStatus.OK)
+  @ResponseCode(SUCCESS_CODES.AUTH_KAKAO_CALLBACK)
+  @ResponseMessage(SUCCESS_MESSAGES[SUCCESS_CODES.AUTH_KAKAO_CALLBACK])
   @UseGuards(KakaoAuthGuard)
   async callback(@Req() req: Request, @Res() res: Response) {
     const loginInput = req.user as {
@@ -40,5 +42,20 @@ export class AuthController {
       maxAge: 1000 * 60 * 60 * 12, // 12시간
     });
     return res.redirect(redirectUrl);
+  }
+
+  @Get('logout')
+  @HttpCode(HttpStatus.OK)
+  @ResponseCode(SUCCESS_CODES.AUTH_LOGOUT_SUCCESS)
+  @ResponseMessage(SUCCESS_MESSAGES[SUCCESS_CODES.AUTH_LOGOUT_SUCCESS])
+  logout(@Res() res: Response) {
+    // 쿠키 삭제
+    res.clearCookie('access_token', {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+    });
+
+    return { isLoggedOut: true };
   }
 }
