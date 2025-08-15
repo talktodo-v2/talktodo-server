@@ -68,10 +68,9 @@ export class AuthController {
     res.end();
   }
 
+  @ApiOperation({ summary: '로그 아웃' })
   @Get('logout')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ResponseCode(SUCCESS_CODES.AUTH_LOGOUT_SUCCESS)
-  @ResponseMessage(SUCCESS_MESSAGES[SUCCESS_CODES.AUTH_LOGOUT_SUCCESS])
   logout(@Res() res: Response) {
     // 쿠키 삭제
     res.clearCookie('access_token', {

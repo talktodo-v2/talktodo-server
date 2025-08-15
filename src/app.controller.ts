@@ -2,12 +2,14 @@ import { Controller, Get, UseInterceptors, HttpCode, HttpStatus } from '@nestjs/
 import { AppService } from './app.service';
 import { ResponseInterceptor, ResponseCode, ResponseMessage } from './common/interceptor/response.interceptor';
 import { SUCCESS_CODES, SUCCESS_MESSAGES } from './common/constants/success-codes';
+import { ApiOperation } from '@nestjs/swagger';
 
 @UseInterceptors(ResponseInterceptor)
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
+  @ApiOperation({ summary: '서버 상태 확인' })
   @Get('/health')
   @HttpCode(HttpStatus.OK)
   @ResponseCode(SUCCESS_CODES.SUCCESS)
