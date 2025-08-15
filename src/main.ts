@@ -22,8 +22,10 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('TalkTodo API')
     .setDescription('API 문서')
-    .setVersion('1.0.0')
-    .addCookieAuth('access_token')
+    .setVersion('1.0.1')
+    .addServer('http://localhost:3001', '로컬 개발 서버')
+    .addServer(process.env.API_URL || 'http://localhost:3001', '운영 서버')
+    .addCookieAuth('access_token', { in: 'cookie', type: 'apiKey' })
     .build();
 
   const doc = SwaggerModule.createDocument(app, config);
@@ -34,7 +36,7 @@ async function bootstrap() {
   });
 
   app.enableCors({
-    origin: ['http://localhost:3000', 'https://talktodo-client.vercel.app', 'http://localhost:3001'],
+    origin: ['http://localhost:3000', 'https://talktodo-client.vercel.app', 'http://localhost:3001', process.env.API_URL],
     credentials: true,
   });
   await app.listen(3001);

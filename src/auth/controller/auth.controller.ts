@@ -6,19 +6,23 @@ import { LoginProvider } from '../types';
 import { KakaoAuthGuard } from '../guards/kakao-auth.guard';
 import { pickRedirectFromState } from '../util/pickRedirectFromState';
 import { SUCCESS_CODES, SUCCESS_MESSAGES } from '../../common/constants/success-codes';
+import { ApiExcludeEndpoint, ApiTags, ApiOperation } from '@nestjs/swagger';
 
+@ApiTags('/auth')
 @UseInterceptors(ResponseInterceptor)
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Get('kakao')
+  @ApiOperation({ summary: '카카오 로그인 시작' })
   @HttpCode(HttpStatus.OK)
   @ResponseCode(SUCCESS_CODES.AUTH_KAKAO_START)
   @ResponseMessage(SUCCESS_MESSAGES[SUCCESS_CODES.AUTH_KAKAO_START])
   @UseGuards(KakaoAuthGuard)
   start() {}
 
+  @ApiExcludeEndpoint()
   @Get('kakao/callback')
   @HttpCode(HttpStatus.OK)
   @ResponseCode(SUCCESS_CODES.AUTH_KAKAO_CALLBACK)
@@ -37,34 +41,38 @@ export class AuthController {
     res.cookie('access_token', accessToken, {
       httpOnly: true,
       secure: false,
+      path: '/',
       sameSite: 'lax',
       maxAge: 1000 * 60 * 60 * 12,
     });
     return res.redirect(redirectUrl);
   }
 
+  @ApiOperation({ summary: ' 스웨거 문서 테스팅을 위한 임시 토큰 발급 API 입니다.' })
   @Get('temp')
-  @HttpCode(HttpStatus.OK)
-  @ResponseCode(SUCCESS_CODES.AUTH_LOGOUT_SUCCESS)
-  @ResponseMessage(SUCCESS_MESSAGES[SUCCESS_CODES.AUTH_LOGOUT_SUCCESS])
-  async getToken(@Res({ passthrough: true }) res: Response) {
-    const accessToken = await this.authService.generateToken({ id: 'c0073b08-9ab5-4dcf-b6d8-d8e6bcdb56cb' });
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async getToken(@Res() res: Response) {
+    if (!process.env.MOCK_USER_ID) {
+      return res.status(HttpStatus.UNAUTHORIZED).end();
+    }
+    const accessToken = await this.authService.generateToken({ id: process.env.MOCK_USER_ID });
 
     res.cookie('access_token', accessToken, {
       httpOnly: true,
       secure: false,
+      path: '/',
       sameSite: 'lax',
       maxAge: 1000 * 60 * 60 * 12,
     });
 
-    return { accessToken };
+    res.end();
   }
 
   @Get('logout')
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ResponseCode(SUCCESS_CODES.AUTH_LOGOUT_SUCCESS)
   @ResponseMessage(SUCCESS_MESSAGES[SUCCESS_CODES.AUTH_LOGOUT_SUCCESS])
-  logout(@Res({ passthrough: true }) res: Response) {
+  logout(@Res() res: Response) {
     // 쿠키 삭제
     res.clearCookie('access_token', {
       httpOnly: true,
@@ -72,6 +80,6 @@ export class AuthController {
       sameSite: 'lax',
     });
 
-    return { isLoggedOut: true };
+    res.end();
   }
 }
