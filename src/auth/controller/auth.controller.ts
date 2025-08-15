@@ -1,4 +1,4 @@
-import { Controller, Get, Req, Res, UseGuards, UseInterceptors, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards, UseInterceptors, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { AuthService } from '../service/auth.service';
 import { ResponseInterceptor, ResponseCode, ResponseMessage } from '../../common/interceptor/response.interceptor';
@@ -34,21 +34,37 @@ export class AuthController {
 
     const redirectUrl = pickRedirectFromState(req.query.state as string);
 
-    // 쿠키로 내려주기, 임시 개발, 차후 분리
     res.cookie('access_token', accessToken, {
       httpOnly: true,
       secure: false,
       sameSite: 'lax',
-      maxAge: 1000 * 60 * 60 * 12, // 12시간
+      maxAge: 1000 * 60 * 60 * 12,
     });
     return res.redirect(redirectUrl);
+  }
+
+  @Get('temp')
+  @HttpCode(HttpStatus.OK)
+  @ResponseCode(SUCCESS_CODES.AUTH_LOGOUT_SUCCESS)
+  @ResponseMessage(SUCCESS_MESSAGES[SUCCESS_CODES.AUTH_LOGOUT_SUCCESS])
+  async getToken(@Res({ passthrough: true }) res: Response) {
+    const accessToken = await this.authService.generateToken({ id: 'c0073b08-9ab5-4dcf-b6d8-d8e6bcdb56cb' });
+
+    res.cookie('access_token', accessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      maxAge: 1000 * 60 * 60 * 12,
+    });
+
+    return { accessToken };
   }
 
   @Get('logout')
   @HttpCode(HttpStatus.OK)
   @ResponseCode(SUCCESS_CODES.AUTH_LOGOUT_SUCCESS)
   @ResponseMessage(SUCCESS_MESSAGES[SUCCESS_CODES.AUTH_LOGOUT_SUCCESS])
-  logout(@Res() res: Response) {
+  logout(@Res({ passthrough: true }) res: Response) {
     // 쿠키 삭제
     res.clearCookie('access_token', {
       httpOnly: true,

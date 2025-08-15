@@ -7,27 +7,28 @@ import { Prisma } from '@prisma/client';
 export class UserRepository {
   constructor(private prisma: PrismaService) {}
 
-  async findUserByEmail(email: string, provider: LoginProvider) {
-    const fieldMap: Record<LoginProvider, Prisma.UserWhereUniqueInput> = {
+  async upsertUser(email: string, provider: LoginProvider, profile: string, nickName: string) {
+    const loginMap: Record<LoginProvider, Prisma.UserWhereUniqueInput> = {
       KAKAO: { kakaoEmail: email },
       GOOGLE: { googleEmail: email },
       NAVER: { naverEmail: email },
     };
 
-    return this.prisma.user.findUnique({
-      where: fieldMap[provider],
-    });
-  }
-
-  async createUser(email: string, nickName: string, profile: string, provider: LoginProvider) {
     const dataMap: Record<LoginProvider, Prisma.UserCreateInput> = {
       KAKAO: { kakaoEmail: email, nickName, profile },
       GOOGLE: { googleEmail: email, nickName, profile },
       NAVER: { naverEmail: email, nickName, profile },
     };
 
-    return this.prisma.user.create({
-      data: dataMap[provider],
+    return this.prisma.user.upsert({
+      where: loginMap[provider],
+      update: {
+        currentLogin: provider,
+        profile,
+      },
+      create: {
+        ...dataMap[provider],
+      },
     });
   }
 }

@@ -31,7 +31,7 @@ model Goal {
   updatedAt DateTime @updatedAt
   authorId  String   @db.Uuid
 
-  author        User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author   User @relation(fields: [authorId], references: [id], onDelete: Cascade)
   tasks    Task[]
 }
 
@@ -47,11 +47,11 @@ model Task {
   startDate  DateTime 
   endDate    DateTime 
   
-  authorId     String @db.Uuid
-  goalId     String @db.Uuid
-
+  authorId   String @db.Uuid
+  goalId     String? @db.Uuid
+  
   author     User @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  goal       Goal @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  goal       Goal? @relation(fields: [goalId], references: [id], onDelete: Cascade)
   
   memo      Memo[]
 
@@ -81,17 +81,17 @@ enum Priority {
 }
 
 enum DayOfWeek {
-  MON
-  TUE
-  WED
-  THU
-  FRI
-  SAT
-  SUN
+  MON @map("월")
+  TUE @map("화")
+  WED @map("수")
+  THU @map("목")
+  FRI @map("금")
+  SAT @map("토")
+  SUN @map("일")
 }
 
 enum Login {
-  KAKAO
-  GOOGLE
-  NAVER
+  KAKAO @map("카카오")
+  GOOGLE @map("구글")
+  NAVER @map("네이버")
 }

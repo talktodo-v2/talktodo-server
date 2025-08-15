@@ -1,7 +1,6 @@
 import { JwtService } from '@nestjs/jwt';
 import { Injectable } from '@nestjs/common';
 import { UserRepository } from '../../user/repository/user.repository';
-import { USER_REGISTER_STATUS } from '../constant/costant';
 import { LoginProvider } from '../types';
 
 export type LoginInput = {
@@ -21,18 +20,14 @@ export class AuthService {
     private jwtService: JwtService
   ) {}
 
-  // 차후에 추가
   async login({ email, provider, profileImage }: LoginInput) {
-    const userExisting = await this.users.findUserByEmail(email, provider);
+    // 사용자 정보 조회 또는 생성
+    let user = await this.users.upsertUser(email, provider, profileImage, '임시닉네임');
 
-    if (!userExisting) await this.users.createUser(email, '임시닉네임', profileImage, provider);
+    const accessToken = await this.generateToken({ id: user.id });
 
-    const accessToken = await this.generateToken({ id: email });
-
-    return { accessToken, userExisting };
+    return { accessToken, user };
   }
-
-  async register(email: string) {}
 
   async generateToken({ id }: GenerateTokenParams): Promise<string> {
     return this.jwtService.sign({ id });

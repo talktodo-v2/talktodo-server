@@ -19,19 +19,3 @@ export const Token = createParamDecorator((tokenName: string = 'access_token', c
   const request = ctx.switchToHttp().getRequest();
   return request.cookies[tokenName];
 });
-
-/**
- * 사용자 ID만 가져오는 데코레이터 (편의용)
- */
-export const UserId = createParamDecorator((data: unknown, ctx: ExecutionContext) => {
-  const request = ctx.switchToHttp().getRequest();
-  return request.user?.id;
-});
-
-/**
- * 사용자 이메일만 가져오는 데코레이터 (편의용)
- */
-export const UserEmail = createParamDecorator((data: unknown, ctx: ExecutionContext) => {
-  const request = ctx.switchToHttp().getRequest();
-  return request.user?.email;
-});
