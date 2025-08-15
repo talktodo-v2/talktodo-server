@@ -22,9 +22,8 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('TalkTodo API')
     .setDescription('API 문서')
-    .setVersion('1.0.1')
-    .addServer('http://localhost:3001', '로컬 개발 서버')
-    .addServer(process.env.API_URL || 'http://localhost:3001', '운영 서버')
+    .setVersion('1.0.2')
+    .addServer('/')
     .addCookieAuth('access_token', { in: 'cookie', type: 'apiKey' })
     .build();
 
