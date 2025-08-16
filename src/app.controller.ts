@@ -1,9 +1,10 @@
 import { Controller, Get, UseInterceptors, HttpCode, HttpStatus } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ResponseInterceptor, ResponseCode, ResponseMessage } from './common/interceptor/response.interceptor';
-import { SUCCESS_CODES, SUCCESS_MESSAGES } from './common/constants/success-codes';
-import { ApiOperation } from '@nestjs/swagger';
+import { SUCCESS_CODES } from './common/constants/success-codes';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('/')
 @UseInterceptors(ResponseInterceptor)
 @Controller()
 export class AppController {
