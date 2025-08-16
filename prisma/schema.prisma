@@ -38,7 +38,7 @@ model Goal {
 model Task {
   id String   @id @default(uuid()) @db.Uuid
   title      String  @db.VarChar(255) 
-  content    String  @db.VarChar(255) 
+  content    String  @db.Text
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   completed  Boolean  @default(false)
@@ -53,25 +53,22 @@ model Task {
   author     User @relation(fields: [authorId], references: [id], onDelete: Cascade)
   goal       Goal? @relation(fields: [goalId], references: [id], onDelete: Cascade)
   
-  memo      Memo[]
+  memo      Memo?
 
   @@index([createdAt(sort: Desc)])
 }
 
 model Memo {
-  taskId    String    @db.Uuid
-  memoId    String    @db.Uuid
+  taskId    String   @db.Uuid
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  content    String    @db.Text
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-
-  authorId   String    @db.Uuid
-  postId    String     @db.Uuid
+  authorId  String   @db.Uuid
   author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
-  @@id([taskId, memoId])
+  @@id([taskId])
 }
 
 enum Priority {
