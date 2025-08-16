@@ -16,11 +16,20 @@ import { TaskService } from '../service/task.service';
 import { ResponseInterceptor, ResponseCode, ResponseMessage } from '../../common/interceptor/response.interceptor';
 import { TransformInterceptor } from '../../common/interceptor/transform.interceptor';
 import { SUCCESS_CODES, SUCCESS_MESSAGES } from '../../common/constants/success-codes';
-import { CreateTaskRequest, TaskResponse, TaskBulkResponse, GetTaskQuery, CreateTaskListRequest, UpdateTaskRequest } from '../dto/index';
+import {
+  CreateTaskRequest,
+  TaskResponse,
+  GetTaskQuery,
+  CreateTaskListRequest,
+  UpdateTaskRequest,
+  MemoRequest,
+  MemoResponse,
+} from '../dto/index';
 import { CurrentUser } from 'src/auth/decorators/user.decorator';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { ApiTags, ApiOperation, ApiResponse, ApiCookieAuth } from '@nestjs/swagger';
 import { ResponseOf, ResponseArrayOf } from 'src/common/util/response-of';
+import { MemoService } from '../service/memo.service';
 
 @ApiTags('/task')
 @ApiCookieAuth('access_token')
@@ -28,7 +37,10 @@ import { ResponseOf, ResponseArrayOf } from 'src/common/util/response-of';
 @UseInterceptors(ResponseInterceptor)
 @Controller('task')
 export class TaskController {
-  constructor(private readonly taskService: TaskService) {}
+  constructor(
+    private readonly taskService: TaskService,
+    private readonly memoService: MemoService
+  ) {}
 
   @ApiOperation({ summary: '단건 할 일 조회' })
   @ApiResponse({ status: HttpStatus.OK, description: '할 일 조회 성공', type: ResponseOf(TaskResponse) })
@@ -49,6 +61,7 @@ export class TaskController {
   @ResponseMessage(SUCCESS_MESSAGES[SUCCESS_CODES.CREATED])
   @UseInterceptors(new TransformInterceptor(TaskResponse))
   async createTask(@Body() dto: CreateTaskRequest, @CurrentUser('id') authorId: string): Promise<TaskResponse> {
+    console.log(authorId);
     return await this.taskService.createTask({
       authorId,
       ...dto,
@@ -98,17 +111,42 @@ export class TaskController {
   }
 
   @ApiOperation({ summary: '다건 할 일 생성' })
-  @ApiResponse({ status: HttpStatus.OK, description: '할 일 생성 성공', type: ResponseOf(TaskResponse) })
+  @ApiResponse({ status: HttpStatus.CREATED, description: '할 일 생성 성공', type: ResponseArrayOf(TaskResponse) })
   @Post('bulk')
   @HttpCode(HttpStatus.CREATED)
   @ResponseCode(SUCCESS_CODES.CREATED)
   @ResponseMessage(SUCCESS_MESSAGES[SUCCESS_CODES.CREATED])
-  async createManyTasks(@Body() dtos: CreateTaskListRequest, @CurrentUser('id') authorId: string): Promise<TaskBulkResponse> {
+  async createManyTasks(@Body() dtos: CreateTaskListRequest, @CurrentUser('id') authorId: string): Promise<TaskResponse[]> {
     return await this.taskService.createManyTasks(
       dtos.items.map((dto) => ({
         authorId,
         ...dto,
-      }))
+      })),
+      authorId
     );
+  }
+
+  @ApiOperation({ summary: '메모 조회' })
+  @ApiResponse({ status: HttpStatus.OK, description: '할 일 생성 성공', type: ResponseArrayOf(MemoResponse) })
+  @Get(':id/memo')
+  @HttpCode(HttpStatus.OK)
+  @ResponseCode(SUCCESS_CODES.DATA_RETRIEVED)
+  @ResponseMessage(SUCCESS_MESSAGES[SUCCESS_CODES.DATA_RETRIEVED])
+  async getMemo(@Param('id', new ParseUUIDPipe()) id: string): Promise<MemoResponse | null> {
+    return await this.memoService.getMemoByTaskId(id);
+  }
+
+  @ApiOperation({ summary: '메모 수정' })
+  @ApiResponse({ status: HttpStatus.OK, description: '할 일 수정 성공', type: ResponseOf(TaskResponse) })
+  @Patch(':id/memo')
+  @HttpCode(HttpStatus.OK)
+  @ResponseCode(SUCCESS_CODES.NO_CONTENT)
+  @ResponseMessage(SUCCESS_MESSAGES[SUCCESS_CODES.NO_CONTENT])
+  async updateMemo(
+    @Body() dto: MemoRequest,
+    @CurrentUser('id') authorId: string,
+    @Param('id', new ParseUUIDPipe()) id: string
+  ): Promise<MemoResponse> {
+    return await this.memoService.updateMemoByTaskId(authorId, id, dto);
   }
 }

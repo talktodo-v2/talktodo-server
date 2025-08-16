@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Transform } from 'class-transformer';
-import { priorityEnToKo, dayEnToKo, DayOfWeek } from '../util/mapper';
+import { priorityEnToKo, dayEnToKo, DayOfWeek } from '../../util/mapper';
 
 export class TaskResponse {
   @ApiProperty({

@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-
+import { TaskResponse } from '../dto/index';
 @Injectable()
 export class TaskRepository {
   private readonly select: Prisma.TaskSelect = {
@@ -18,15 +18,52 @@ export class TaskRepository {
 
   constructor(private prisma: PrismaService) {}
 
-  async createTask(data: Prisma.TaskCreateInput) {
-    return this.prisma.task.create({
-      data,
-      select: this.select,
-    });
+  async createTask(data: Prisma.TaskCreateInput, authorId: string) {
+    try {
+      let task;
+
+      console.log(data);
+      await this.prisma.$transaction(async (tx) => {
+        task = await tx.task.create({
+          data,
+          select: this.select,
+        });
+
+        await tx.memo.create({
+          data: {
+            task: { connect: { id: task.id } },
+            author: { connect: { id: authorId } },
+            content: '',
+          },
+        });
+      });
+
+      return task;
+    } catch (error) {
+      console.error(error);
+      throw new Error('Task creation failed');
+    }
   }
 
-  async createManyTasks(data: Prisma.TaskCreateManyInput[]) {
-    return this.prisma.task.createMany({ data });
+  async createManyTasks(data: Prisma.TaskCreateManyInput[], authorId: string) {
+    let tasks: TaskResponse[] = [];
+
+    await this.prisma.$transaction(async (tx) => {
+      for (const d of data) {
+        const task = await tx.task.create({ data: d, select: this.select });
+
+        await tx.memo.create({
+          data: {
+            task: { connect: { id: task.id } },
+            author: { connect: { id: authorId } },
+            content: '',
+          },
+        });
+
+        tasks.push(task);
+      }
+    });
+    return tasks;
   }
 
   async findTaskById(id: string) {

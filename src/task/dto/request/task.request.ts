@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Length, IsDateString, IsArray, IsOptional, IsUUID, IsDate, IsEnum, IsBoolean, ValidateNested } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
-import { priorityKoToEn, dayKoToEn, DayOfWeek, Priority } from '../util/mapper';
+import { priorityKoToEn, dayKoToEn, DayOfWeek, Priority } from '../../util/mapper';
 
 export class CreateTaskRequest {
   @ApiProperty({

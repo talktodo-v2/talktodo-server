@@ -12,16 +12,19 @@ export class TaskService {
   async createTask(createInput: Input) {
     const { authorId, goalId, startDate, endDate, ...rest } = createInput;
 
-    return this.taskRepository.createTask({
-      ...rest,
-      startDate: new Date(startDate),
-      endDate: new Date(endDate),
-      author: { connect: { id: authorId } },
-      ...(goalId ? { goal: { connect: { id: goalId } } } : {}),
-    });
+    return this.taskRepository.createTask(
+      {
+        ...rest,
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
+        author: { connect: { id: authorId } },
+        ...(goalId ? { goal: { connect: { id: goalId } } } : {}),
+      },
+      authorId
+    );
   }
 
-  async createManyTasks(createInputs: Input[]) {
+  async createManyTasks(createInputs: Input[], authorId: string) {
     return this.taskRepository.createManyTasks(
       createInputs.map((createInput) => {
         const { authorId, goalId, startDate, endDate, ...rest } = createInput;
@@ -32,7 +35,8 @@ export class TaskService {
           authorId,
           ...(goalId ? { goalId } : {}),
         };
-      })
+      }),
+      authorId
     );
   }
 
