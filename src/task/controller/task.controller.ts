@@ -20,6 +20,7 @@ import { CreateTaskRequest, TaskResponse, TaskBulkResponse, GetTaskQuery, Create
 import { CurrentUser } from 'src/auth/decorators/user.decorator';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { ApiTags, ApiOperation, ApiResponse, ApiCookieAuth } from '@nestjs/swagger';
+import { ResponseOf, ResponseArrayOf } from 'src/common/util/response-of';
 
 @ApiTags('/task')
 @ApiCookieAuth('access_token')
@@ -30,7 +31,7 @@ export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
   @ApiOperation({ summary: '단건 할 일 조회' })
-  @ApiResponse({ status: HttpStatus.OK, description: '할 일 조회 성공', type: TaskResponse })
+  @ApiResponse({ status: HttpStatus.OK, description: '할 일 조회 성공', type: ResponseOf(TaskResponse) })
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   @ResponseCode(SUCCESS_CODES.DATA_RETRIEVED)
@@ -41,7 +42,7 @@ export class TaskController {
   }
 
   @ApiOperation({ summary: '단건 할 일 생성' })
-  @ApiResponse({ status: HttpStatus.CREATED, description: '할 일 생성 성공', type: TaskResponse })
+  @ApiResponse({ status: HttpStatus.CREATED, description: '할 일 생성 성공', type: ResponseOf(TaskResponse) })
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ResponseCode(SUCCESS_CODES.CREATED)
@@ -55,7 +56,7 @@ export class TaskController {
   }
 
   @ApiOperation({ summary: '단건 할 일 수정' })
-  @ApiResponse({ status: HttpStatus.OK, description: '할 일 수정 성공' })
+  @ApiResponse({ status: HttpStatus.OK, description: '할 일 수정 성공', type: ResponseOf(TaskResponse) })
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
   @ResponseCode(SUCCESS_CODES.NO_CONTENT)
@@ -73,7 +74,7 @@ export class TaskController {
   }
 
   @ApiOperation({ summary: '단건 할 일 삭제' })
-  @ApiResponse({ status: HttpStatus.OK, description: '할 일 삭제 성공', type: TaskResponse })
+  @ApiResponse({ status: HttpStatus.OK, description: '할 일 삭제 성공', type: ResponseOf(TaskResponse) })
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   @ResponseCode(SUCCESS_CODES.DELETED)
@@ -84,18 +85,20 @@ export class TaskController {
   }
 
   @ApiOperation({ summary: '다건 할 일 조회' })
-  @ApiResponse({ status: HttpStatus.OK, description: '할 일 목록 조회 성공' })
+  @ApiResponse({ status: HttpStatus.OK, description: '할 일 목록 조회 성공', type: ResponseArrayOf(TaskResponse) })
   @Get()
   @HttpCode(HttpStatus.OK)
   @ResponseCode(SUCCESS_CODES.DATA_RETRIEVED)
   @ResponseMessage(SUCCESS_MESSAGES[SUCCESS_CODES.DATA_RETRIEVED])
   @UseInterceptors(new TransformInterceptor(TaskResponse))
   async getTask(@CurrentUser('id') authorId: string, @Query() query: GetTaskQuery): Promise<TaskResponse[]> {
-    return await this.taskService.findManyTaskById(authorId, query);
+    const task = await this.taskService.findManyTaskById(authorId, query);
+
+    return task;
   }
 
   @ApiOperation({ summary: '다건 할 일 생성' })
-  @ApiResponse({ status: HttpStatus.OK, description: '할 일 생성 성공' })
+  @ApiResponse({ status: HttpStatus.OK, description: '할 일 생성 성공', type: ResponseOf(TaskResponse) })
   @Post('bulk')
   @HttpCode(HttpStatus.CREATED)
   @ResponseCode(SUCCESS_CODES.CREATED)

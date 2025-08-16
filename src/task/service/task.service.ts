@@ -45,9 +45,7 @@ export class TaskService {
   async findTaskById(id: string) {
     const task = await this.taskRepository.findTaskById(id);
 
-    if (!task) {
-      throw new NotFoundException();
-    }
+    if (!task) throw new NotFoundException();
 
     return task;
   }

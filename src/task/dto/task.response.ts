@@ -77,6 +77,8 @@ export class TaskResponse {
   completed: boolean;
 }
 
+export class TaskListResponse extends Array<TaskResponse> {}
+
 export class TaskBulkResponse {
   @ApiProperty({
     description: '생성된 할일의 개수',
