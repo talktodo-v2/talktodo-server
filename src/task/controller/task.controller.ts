@@ -24,6 +24,7 @@ import {
   UpdateTaskRequest,
   MemoRequest,
   MemoResponse,
+  ReadTaskResponse,
 } from '../dto/index';
 import { CurrentUser } from 'src/auth/decorators/user.decorator';
 import { Auth } from 'src/auth/decorators/auth.decorator';
@@ -43,13 +44,13 @@ export class TaskController {
   ) {}
 
   @ApiOperation({ summary: '단건 할 일 조회' })
-  @ApiResponse({ status: HttpStatus.OK, description: '할 일 조회 성공', type: ResponseOf(TaskResponse) })
+  @ApiResponse({ status: HttpStatus.OK, description: '할 일 조회 성공', type: ResponseOf(ReadTaskResponse) })
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   @ResponseCode(SUCCESS_CODES.DATA_RETRIEVED)
   @ResponseMessage(SUCCESS_MESSAGES[SUCCESS_CODES.DATA_RETRIEVED])
   @UseInterceptors(new TransformInterceptor(TaskResponse))
-  async getTaskById(@Param('id', new ParseUUIDPipe()) id: string): Promise<TaskResponse> {
+  async getTaskById(@Param('id', new ParseUUIDPipe()) id: string): Promise<ReadTaskResponse> {
     return await this.taskService.findTaskById(id);
   }
 
@@ -98,13 +99,13 @@ export class TaskController {
   }
 
   @ApiOperation({ summary: '다건 할 일 조회' })
-  @ApiResponse({ status: HttpStatus.OK, description: '할 일 목록 조회 성공', type: ResponseArrayOf(TaskResponse) })
+  @ApiResponse({ status: HttpStatus.OK, description: '할 일 목록 조회 성공', type: ResponseArrayOf(ReadTaskResponse) })
   @Get()
   @HttpCode(HttpStatus.OK)
   @ResponseCode(SUCCESS_CODES.DATA_RETRIEVED)
   @ResponseMessage(SUCCESS_MESSAGES[SUCCESS_CODES.DATA_RETRIEVED])
-  @UseInterceptors(new TransformInterceptor(TaskResponse))
-  async getTask(@CurrentUser('id') authorId: string, @Query() query: GetTaskQuery): Promise<TaskResponse[]> {
+  @UseInterceptors(new TransformInterceptor(ReadTaskResponse))
+  async getTask(@CurrentUser('id') authorId: string, @Query() query: GetTaskQuery): Promise<ReadTaskResponse[]> {
     const task = await this.taskService.findManyTaskById(authorId, query);
 
     return task;

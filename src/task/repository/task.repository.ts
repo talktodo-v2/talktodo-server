@@ -12,7 +12,6 @@ export class TaskRepository {
     endDate: true,
     priority: true,
     repeatDays: true,
-    goalId: true,
     completed: true,
   };
 
@@ -22,7 +21,6 @@ export class TaskRepository {
     try {
       let task;
 
-      console.log(data);
       await this.prisma.$transaction(async (tx) => {
         task = await tx.task.create({
           data,
@@ -46,7 +44,7 @@ export class TaskRepository {
   }
 
   async createManyTasks(data: Prisma.TaskCreateManyInput[], authorId: string) {
-    let tasks: TaskResponse[] = [];
+    let tasks: any[] = [];
 
     await this.prisma.$transaction(async (tx) => {
       for (const d of data) {
@@ -71,7 +69,15 @@ export class TaskRepository {
       where: {
         id,
       },
-      select: this.select,
+      select: {
+        ...this.select,
+        goal: {
+          select: {
+            id: true,
+            content: true,
+          },
+        },
+      },
     });
   }
 
@@ -90,7 +96,15 @@ export class TaskRepository {
         ...overlap,
         ...(goalId && { goalId }),
       },
-      select: this.select,
+      select: {
+        ...this.select,
+        goal: {
+          select: {
+            id: true,
+            content: true,
+          },
+        },
+      },
     });
   }
 

@@ -62,19 +62,27 @@ export class TaskResponse {
   repeatDays: string[];
 
   @ApiProperty({
-    description: '목표 ID',
-    example: 'c0073b08-9ab5-4dcf-b6d8-d8e6bcdb56cb',
-    nullable: true,
-  })
-  @Expose()
-  goalId: string | null;
-
-  @ApiProperty({
     description: '완료 상태',
     example: false,
   })
   @Expose()
   completed: boolean;
+}
+
+export class ReadTaskResponse extends TaskResponse {
+  @ApiProperty({
+    description: '목표',
+    example: {
+      id: 'a1234567-89ab-cdef-0123-456789abcdef',
+      content: '프로젝트 기획안 작성',
+    },
+    nullable: true,
+  })
+  @Expose()
+  goal: {
+    id: string;
+    content: string;
+  } | null;
 }
 
 export class TaskListResponse extends Array<TaskResponse> {}
