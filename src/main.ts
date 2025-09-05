@@ -34,6 +34,10 @@ async function bootstrap() {
     },
   });
 
+  app.getHttpAdapter().get('/api-json', (req, res) => {
+    res.json(doc);
+  });
+
   app.enableCors({
     origin: ['http://localhost:3000', 'https://talktodo-client.vercel.app', 'http://localhost:3001', process.env.API_URL],
     credentials: true,
